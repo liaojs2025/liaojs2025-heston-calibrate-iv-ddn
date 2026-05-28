@@ -1,0 +1,44 @@
+% Table: Training Configuration and Progress of Heston DDN
+\begin{table}[htbp]
+  \centering
+  \caption{Training Configuration and Convergence of the Heston DDN Model}
+  \label{tab:training_details}
+  \begin{tabular}{lc}
+    \toprule
+    \textbf{Hyperparameter / Setting} & \textbf{Value} \\
+    \midrule
+    \multicolumn{2}{l}{\textit{Architecture}} \\
+    \quad Input dimension              & 8 \\
+    \quad Total trainable parameters   & 114,751 \\
+    \quad Output target                & Implied Volatility (IV) \\
+    \midrule
+    \multicolumn{2}{l}{\textit{Training Configuration}} \\
+    \quad Dataset size (total)         & 172,215 \\
+    \quad Training / Validation / Test split & 70\% / 15\% / 15\% \\
+    \quad Batch size                   & 256 \\
+    \quad Optimizer                    & Adam \\
+    \quad Initial learning rate        & $1 \times 10^{-3}$ \\
+    \quad LR scheduler                 & StepLR ($\gamma=0.9$, step = 20 epochs) \\
+    \quad Final learning rate (epoch 200) & $3.49 \times 10^{-4}$ \\
+    \quad Total epochs                 & 200 \\
+    \quad Total training time          & 507.2 s \\
+    \midrule
+    \multicolumn{2}{l}{\textit{Loss Function (Multiplicative Trick)}} \\
+    \quad IV loss                      & MSE$(\hat{\sigma}_{\text{IV}},\, \sigma_{\text{IV}})$ \\
+    \quad Gradient loss                & Smooth L1$\!\left(\tfrac{\partial\hat{\sigma}_{\text{IV}}}{\partial\boldsymbol{\theta}}\!\times\!\mathcal{V},\; \tfrac{\partial P}{\partial\boldsymbol{\theta}}\right)$ \\
+    \quad Warm-up epochs ($\lambda_{\text{deriv}}=0$) & 20 \\
+    \quad Gradient loss weight after warm-up ($\lambda_{\text{deriv}}$) & 1.0 \\
+    \midrule
+    \multicolumn{2}{l}{\textit{Training Convergence (selected epochs)}} \\
+    \quad Epoch 1  — Val.\ mean rel.\ error  & 8.95\% \\
+    \quad Epoch 20 — Val.\ mean rel.\ error  & 2.14\% \\
+    \quad Epoch 40 — Val.\ mean rel.\ error  & 0.94\% \\
+    \quad Epoch 80 — Val.\ mean rel.\ error  & 0.57\% \\
+    \quad Epoch 200 — Val.\ mean rel.\ error & 0.50\% \\
+    \bottomrule
+  \end{tabular}
+  \begin{tablenotes}
+    \small
+    \item \textit{Note:} The multiplicative trick avoids division by Vega by mapping the predicted IV gradient back to price space: $\frac{\partial\hat{\sigma}_{\text{IV}}}{\partial\boldsymbol{\theta}}\times\mathcal{V}$ is compared with the true price-space gradient $\partial P/\partial\boldsymbol{\theta}$, thereby preventing gradient explosion when Vega approaches zero. Smooth L1 (Huber) loss is used for robustness against outliers.
+  \end{tablenotes}
+\end{table}

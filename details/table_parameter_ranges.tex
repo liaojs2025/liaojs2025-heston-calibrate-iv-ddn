@@ -1,0 +1,22 @@
+\begin{table}[htbp]
+\centering
+\caption{Parameter Ranges for Latin Hypercube Sampling}
+\label{tab:param_ranges}
+\begin{tabular}{llcc}
+\toprule
+Parameter & Description & Lower Bound & Upper Bound \\
+\midrule
+\multicolumn{4}{l}{\textit{Heston Model Parameters}} \\
+$\kappa$ & Mean-reversion speed      & $0.01$ & $5.00$ \\
+$\theta$ & Long-run variance         & $0.01$ & $1.00$ \\
+$\sigma$ & Volatility of variance    & $0.10$ & $1.00$ \\
+$\rho$   & Correlation               & $-0.90$ & $-0.05$ \\
+$v_0$    & Initial variance          & $0.01$ & $1.00$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Market Variables}} \\
+$r$             & Risk-free rate         & $0.001$ & $0.10$ \\
+$\tau$          & Time to maturity (yr)  & $0.05$  & $1.00$ \\
+$\ln(K/S_0)$    & Log-moneyness          & $-1.0$  & $1.0$  \\
+\bottomrule
+\end{tabular}
+\end{table}

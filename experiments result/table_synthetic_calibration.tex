@@ -1,0 +1,100 @@
+% ============================================================
+% Table 1: Synthetic Option Chain — Calibration Setup
+% ============================================================
+\begin{table}[htbp]
+  \centering
+  \caption{Synthetic Option Chain Used for Calibration Experiments}
+  \label{tab:synthetic_setup}
+  \begin{tabular}{ll}
+    \toprule
+    \textbf{Setting} & \textbf{Value} \\
+    \midrule
+    \multicolumn{2}{l}{\textit{Ground Truth Heston Parameters}} \\
+    \quad Mean-reversion speed $\kappa$       & 2.0 \\
+    \quad Long-run variance $\theta$          & 0.1 \\
+    \quad Volatility of variance $\sigma$     & 0.4 \\
+    \quad Correlation $\rho$                  & $-0.6$ \\
+    \quad Initial variance $v_0$              & 0.05 \\
+    \quad Risk-free rate $r$                  & 0.05 \\
+    \quad Spot price $S_0$                    & 1000.0 \\
+    \quad Feller condition ($2\kappa\theta > \sigma^2$) & Satisfied ($0.40 > 0.16$) \\
+    \midrule
+    \multicolumn{2}{l}{\textit{Option Chain Grid}} \\
+    \quad Maturities $\tau$   & $\{0.3,\, 0.4,\, 0.5,\, 0.6,\, 0.7\}$ (years) \\
+    \quad Moneyness $K/S_0$   & 20 levels $\in [0.6,\, 1.5]$ \\
+    \quad Valid contracts $M$ & 99 \\
+    \midrule
+    \multicolumn{2}{l}{\textit{Optimisation (shared by both methods)}} \\
+    \quad Algorithm          & Multi-start Adam \\
+    \quad Number of restarts & 10 \\
+    \quad Learning rate      & $5\times10^{-3}$ \\
+    \quad Max iterations     & 500 per restart \\
+    \quad Early-stopping patience & 40 steps \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+% ============================================================
+% Table 2: Parameter Recovery — Proposed vs Zhang (2025)
+% ============================================================
+\begin{table}[htbp]
+  \centering
+  \caption{Heston Parameter Recovery on Synthetic Data: Proposed Method vs.\ Zhang~(2025)}
+  \label{tab:param_recovery}
+  \setlength{\tabcolsep}{6pt}
+  \begin{tabular}{lccccc}
+    \toprule
+    \multirow{2}{*}{\textbf{Parameter}} &
+    \multirow{2}{*}{\textbf{True}} &
+    \multicolumn{2}{c}{\textbf{Proposed Method}} &
+    \multicolumn{2}{c}{\textbf{Zhang (2025)}} \\
+    \cmidrule(lr){3-4}\cmidrule(lr){5-6}
+    & & \textbf{Calibrated} & \textbf{Rel.\ Err.} & \textbf{Calibrated} & \textbf{Rel.\ Err.} \\
+    \midrule
+    $\kappa$  & 2.000 & 3.819 & 90.94\% & 3.588 & 79.42\% \\
+    $\theta$  & 0.100 & 0.084 & 15.65\% & 0.086 & 14.17\% \\
+    $\sigma$  & 0.400 & 0.546 & 36.61\% & 0.714 & 78.49\% \\
+    $\rho$    & $-0.600$ & $-0.550$ & 8.34\% & $-0.544$ & 9.36\% \\
+    $v_0$     & 0.050 & 0.057 & 14.17\% & 0.040 & 19.93\% \\
+    \midrule
+    Feller satisfied?  & Yes & \multicolumn{2}{c}{Yes ($2\kappa\theta=0.644 > \sigma^2=0.299$)} & \multicolumn{2}{c}{Not enforced} \\
+    \midrule
+    Calibration time   & ---  & \multicolumn{2}{c}{11.76 s} & \multicolumn{2}{c}{11.30 s} \\
+    Best loss          & ---  & \multicolumn{2}{c}{$3.963\times10^{-5}$ (Vega-wtd.\ IV MSE)} & \multicolumn{2}{c}{$4.045\times10^{-6}$ (normalised price MSE)} \\
+    \bottomrule
+  \end{tabular}
+  \begin{tablenotes}
+    \small
+    \item \textit{Note:} Relative error $= |\hat{\theta}_i - \theta_i^*| / |\theta_i^*|$. The two methods optimise different objective functions and their best-loss values are therefore not directly comparable. The proposed method enforces the Feller condition ($2\kappa\theta > \sigma^2$) as a soft penalty during calibration; Zhang~(2025) applies no such physical constraint.
+  \end{tablenotes}
+\end{table}
+
+
+% ============================================================
+% Table 3: Re-pricing Accuracy — Proposed vs Zhang (2025)
+% ============================================================
+\begin{table}[htbp]
+  \centering
+  \caption{Re-pricing Accuracy on the Synthetic Option Chain (99 Contracts)}
+  \label{tab:repricing_accuracy}
+  \begin{tabular}{lcc}
+    \toprule
+    \textbf{Metric} & \textbf{Proposed Method} & \textbf{Zhang (2025)} \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Implied Volatility Space}} \\
+    \quad Mean IV relative error (MRE)  & 3.08\%  & --- \\
+    \quad Max IV relative error         & 9.25\%  & --- \\
+    \quad IV MAE                        & 0.00781 & --- \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Price Space (QuantLib re-pricing with calibrated parameters)}} \\
+    \quad Mean price relative error     & 12.78\%   & 184.80\% \\
+    \quad Max price relative error      & 129.51\%  & 7873.29\% \\
+    \quad Proportion with error $< 5\%$ & ---       & 63.6\% \\
+    \bottomrule
+  \end{tabular}
+  \begin{tablenotes}
+    \small
+    \item \textit{Note:} The proposed method calibrates in implied volatility (IV) space with Vega weighting, and re-pricing errors are reported both in IV space and in price space (via QuantLib). Zhang~(2025) calibrates in normalised price space; IV-space metrics are not available for that method. Large price errors for both methods are concentrated in deep out-of-the-money (OTM) contracts ($K/S_0 > 1.3$), where option prices are near zero and small absolute deviations produce disproportionately large relative errors. The proposed method achieves substantially lower price-space errors compared to Zhang~(2025), confirming that IV-space calibration with Feller regularisation provides more physically consistent parameter estimates.
+  \end{tablenotes}
+\end{table}

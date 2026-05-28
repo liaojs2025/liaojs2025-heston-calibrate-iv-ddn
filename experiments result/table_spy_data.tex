@@ -1,0 +1,41 @@
+% ============================================================
+% Table: SPY Market Data Description
+% ============================================================
+\begin{table}[htbp]
+  \centering
+  \caption{Description of SPY Call Option Data Used for Real-Market Calibration}
+  \label{tab:spy_data}
+  \begin{tabular}{lcc}
+    \toprule
+    \textbf{Property} & \textbf{2022-09-01 (Calibration)} & \textbf{2022-09-02 (Validation)} \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Underlying Asset}} \\
+    \quad Spot price $S_0$ (\$)       & 396.39 & 392.27 \\
+    \quad Days to expiry (DTE)        & 106    & 105    \\
+    \quad Time to maturity $\tau$ (yr)& 0.2905 & 0.2878 \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Option Chain (after cleaning)}} \\
+    \quad Number of valid contracts   & 10 & 10 \\
+    \quad Strike range $K$ (\$)       & [392, 401] & [380, 397] \\
+    \quad Log-moneyness $\ln(K/S_0)$  & [$-$0.011, $+$0.012] & [$-$0.032, $-$0.001] \\
+    \quad Market IV range             & [0.2161, 0.2268] & [0.2156, 0.2307] \\
+    \quad Vega range                  & [0.83, 0.85] & [0.78, 0.84] \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Risk-Free Rate (continuous, interpolated)}} \\
+    \quad $r$ at $\tau \approx 0.29$ yr & 0.03027 & 0.02986 \\
+    \quad Rate source                 & \multicolumn{2}{c}{US Par Yield Curve (Federal Reserve, 2020--2023)} \\
+    \quad Interpolation method        & \multicolumn{2}{c}{Cubic spline on 1mo/2mo/3mo/6mo/1yr nodes} \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Cleaning Criteria (both methods)}} \\
+    \quad Option type                 & \multicolumn{2}{c}{Call only} \\
+    \quad DTE filter                  & \multicolumn{2}{c}{40 -- 300 trading days} \\
+    \quad Log-moneyness filter        & \multicolumn{2}{c}{$\ln(K/S_0) \in [-0.15,\; 0.20]$} \\
+    \quad Volume filter               & \multicolumn{2}{c}{Positive trading volume required} \\
+    \quad IV validity                 & \multicolumn{2}{c}{IV $> 0$ and Vega $> 0$ (Black--Scholes inversion)} \\
+    \bottomrule
+  \end{tabular}
+  \begin{tablenotes}
+    \small
+    \item \textit{Note:} Mid-quote prices (average of bid and ask) are used as market prices. Implied volatilities and Vega values are computed via Black--Scholes inversion using \texttt{py\_vollib\_vectorized}. Risk-free rates are converted from par yields to continuously compounded rates via $r_c = \ln(1 + R \cdot t)/t$ and interpolated with a cubic spline across the available maturity nodes. For each day, the 10 near-the-money contracts with the highest data quality are selected for calibration and validation.
+  \end{tablenotes}
+\end{table}

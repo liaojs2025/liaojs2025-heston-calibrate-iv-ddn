@@ -1,0 +1,28 @@
+% Table: Test Set Performance of Heston DDN (IV Prediction)
+\begin{table}[htbp]
+  \centering
+  \caption{Test Set Performance of the Heston DDN Model on Implied Volatility Prediction}
+  \label{tab:test_performance}
+  \begin{tabular}{lc}
+    \toprule
+    \textbf{Metric} & \textbf{Value} \\
+    \midrule
+    Test set size                               & 25,832 \\
+    \midrule
+    Mean Absolute Error (MAE)                   & 0.002705 \\
+    Root Mean Squared Error (RMSE)              & 0.005009 \\
+    Mean Relative Error (MRE)                   & 0.4922\% \\
+    Median Relative Error                       & 0.2321\% \\
+    Maximum Relative Error                      & 50.18\% \\
+    \midrule
+    Proportion with relative error $< 1\%$      & 91.0\% \\
+    Proportion with relative error $< 5\%$      & 98.9\% \\
+    \bottomrule
+  \end{tabular}
+  \begin{tablenotes}
+    \small
+    \item \textit{Note:} Relative error is defined as $|\hat{\sigma}_{\text{IV}} - \sigma_{\text{IV}}|\,/\,(|\sigma_{\text{IV}}| + \epsilon)\times 100\%$ with $\epsilon = 10^{-6}$.
+    The large maximum relative error (50.18\%) is attributed to a small number of deep out-of-the-money contracts where the true IV is close to its lower bound; over 98.9\% of the test samples achieve a relative error below 5\%.
+  \end{tablenotes}
+\end{table}
+%Table~\ref{tab:test_performance} summarises the predictive performance of the Heston DDN model on the held-out test set comprising 25,832 samples. The model achieves a Mean Absolute Error (MAE) of 0.002705 and a Root Mean Squared Error (RMSE) of 0.005009 in implied volatility units, demonstrating consistently tight point-wise accuracy across the test distribution. In relative terms, the mean relative error stands at 0.49% and the median relative error at 0.23%, indicating that the error distribution is right-skewed with the vast majority of predictions concentrated near zero error. Notably, 91.0% of test samples attain a relative error below 1%, and 98.9% fall within the 5% threshold, confirming the model's robustness across a wide range of option contract specifications. The observed maximum relative error of 50.18% is attributable to a small subset of deep out-of-the-money contracts for which the true implied volatility approaches its numerical lower bound, rendering relative metrics disproportionately sensitive to small absolute deviations; such cases are well-documented in the options pricing literature and do not materially affect the aggregate performance. Overall, these results demonstrate that the proposed DDN architecture, trained with the multiplicative trick gradient regularisation and Feller-conditioned data, achieves high-fidelity implied volatility prediction suitable for practical Heston model calibration.

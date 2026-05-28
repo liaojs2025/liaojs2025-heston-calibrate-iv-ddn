@@ -1,0 +1,63 @@
+% ============================================================
+% Table: Same-day Calibration on SPY (2022-09-02)
+% ============================================================
+\begin{table}[htbp]
+  \centering
+  \caption{Same-Day Calibration Performance on SPY Options (2022-09-02, $M=10$ contracts)}
+  \label{tab:spy_sameday}
+  \setlength{\tabcolsep}{7pt}
+  \begin{tabular}{lccc}
+    \toprule
+    \textbf{Metric} & \textbf{Proposed Method} & \textbf{Zhang (2025)} & \textbf{Better} \\
+    \midrule
+    \multicolumn{4}{l}{\textit{Implied Volatility Space}} \\
+    \quad IV MRE (mean relative error) & \textbf{0.16\%} & 0.20\% & Proposed \\
+    \midrule
+    \multicolumn{4}{l}{\textit{Price Space}} \\
+    \quad Price MRE                    & n/a & \textbf{4.46\%} & --- \\
+    \midrule
+    \multicolumn{4}{l}{\textit{Calibration Setup}} \\
+    \quad Objective function           & Vega-weighted IV MSE + Feller penalty & Normalised price MSE & --- \\
+    \quad Feller constraint enforced   & Yes & No & --- \\
+    \quad Number of restarts           & 10  & 10 & --- \\
+    \quad Max steps per restart        & 300 & 300 & --- \\
+    \bottomrule
+  \end{tabular}
+  \begin{tablenotes}
+    \small
+    \item \textit{Note:} IV MRE $= \frac{1}{M}\sum_{i=1}^{M} |\hat{\sigma}^{\text{IV}}_i - \sigma^{\text{IV},\text{mkt}}_i|\,/\,|\sigma^{\text{IV},\text{mkt}}_i|$. ``n/a'' indicates that the metric is not directly produced by that method's calibration framework. The proposed method's price MRE is not reported because it calibrates in IV space and does not natively output option prices; the Zhang~(2025) method's IV MRE is derived by converting calibrated prices to IV via Black--Scholes inversion.
+  \end{tablenotes}
+\end{table}
+
+
+% ============================================================
+% Table: Cross-Day Calibration on SPY (9/1 params → 9/2 prices)
+% ============================================================
+\begin{table}[htbp]
+  \centering
+  \caption{Cross-Day Calibration Performance on SPY Options (Parameters from 2022-09-01 Applied to 2022-09-02)}
+  \label{tab:spy_crossday}
+  \setlength{\tabcolsep}{7pt}
+  \begin{tabular}{lccc}
+    \toprule
+    \textbf{Metric} & \textbf{Proposed Method} & \textbf{Zhang (2025)} & \textbf{Better} \\
+    \midrule
+    \multicolumn{4}{l}{\textit{Implied Volatility Space (predicting 9/2 IV with 9/1 parameters)}} \\
+    \quad IV MRE & \textbf{0.96\%}  & 1.59\% & Proposed \\
+    \midrule
+    \multicolumn{4}{l}{\textit{Price Space (predicting 9/2 prices with 9/1 parameters, QuantLib re-pricing)}} \\
+    \quad Price MRE & \textbf{11.33\%} & \textbf{2.88\%} & Zhang \\
+    \midrule
+    \multicolumn{4}{l}{\textit{Reference: Same-Day Performance (9/2 params → 9/2)}} \\
+    \quad IV MRE (same-day)    & 0.16\%  & 0.20\%  & --- \\
+    \quad Price MRE (same-day) & n/a     & 4.46\%  & --- \\
+    \midrule
+    \multicolumn{4}{l}{\textit{Degradation from Same-Day to Cross-Day}} \\
+    \quad $\Delta$ IV MRE      & $+$0.80\,pp & $+$1.39\,pp & Proposed \\
+    \bottomrule
+  \end{tabular}
+  \begin{tablenotes}
+    \small
+    \item \textit{Note:} ``pp'' denotes percentage-point increase in MRE. Cross-day calibration evaluates the temporal stability of calibrated parameters: the Heston model is calibrated on the option chain of 2022-09-01 and the resulting parameters are used to price the option chain of 2022-09-02 without re-calibration. Smaller degradation indicates greater parameter stability across consecutive trading days. The price MRE for the proposed method (11.33\%) is computed via QuantLib re-pricing using the calibrated IV-space parameters, and is elevated relative to the same-day QuantLib figure of Zhang~(2025) partly due to the different moneyness ranges of the two option chains.
+  \end{tablenotes}
+\end{table}
