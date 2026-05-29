@@ -1,4 +1,4 @@
-# Heston Model Calibration via IV-DDN
+# Heston Model Calibration
 
 **Deep Differential Network for Heston Model Calibration in Implied Volatility Space**
 
@@ -25,37 +25,47 @@ This project addresses these challenges by:
 
 ```
 .
+├── data/                        # Shared market & training data (all notebooks read from here)
+│   ├── heston_dataset_200k.csv            # Pre-generated training data (200k samples)
+│   ├── spy_2022_09_01.csv                 # SPY call options (Sept 1, 2022)
+│   ├── spy_2022_09_02.csv                 # SPY call options (Sept 2, 2022)
+│   ├── nvda_2020_2022.csv                 # NVDA option data (2020-2022, full history)
+│   ├── nvda_2021-11-01.csv                # NVDA options for 2021-11-01 (extracted subset)
+│   ├── nvda_2021-11-02.csv                # NVDA options for 2021-11-02 (extracted subset)
+│   └── data_clean.ipynb                   # Data cleaning notebook
+│
 ├── Heston_Project/              # Main implementation (proposed IV-DDN method)
 │   ├── modules/
 │   │   ├── model.py             # HestonDDN neural network architecture
 │   │   ├── calibration.py       # Multi-start Adam calibrator with Feller penalty
 │   │   ├── pricing.py           # QuantLib pricing, IV/Vega computation, data generation
 │   │   └── __init__.py
-│   ├── data/
-│   │   ├── heston_dataset_200k.csv        # Pre-generated training data (200k samples)
-│   │   ├── spy_2022_09_01.csv             # SPY call options (Sept 1, 2022)
-│   │   └── spy_2022_09_02.csv             # SPY call options (Sept 2, 2022)
 │   ├── models/
 │   │   └── heston_ddn_weights.pth         # Pre-trained model weights
 │   ├── 01_train.ipynb           # Training notebook: DDN training pipeline
-│   ├── 02_calibrate.ipynb       # Calibration notebook: synthetic & real-market experiments
+│   ├── 02_calibrate_v2.ipynb    # Calibration notebook: synthetic & real-market experiments
 │   └── 03_calibrate_visualize.ipynb  # Visualization of calibration results
 │
 ├── Zhang_realize/               # Baseline implementation (Zhang et al. 2025, price-space DDN)
-│   └── [similar structure]
+│   ├── modules/                 # Price-space DDN modules
+│   ├── models/
+│   │   └── heston_ddn_weights.pth         # Baseline pre-trained weights
+│   ├── 01_train_zhang.ipynb
+│   ├── 02_calibrate_zhang_v2.ipynb
+│   └── 03_calibrate_visualize_zhang.ipynb
 │
 ├── experiments result/          # LaTeX tables and text for thesis/paper
 │   ├── table_training_details.tex         # Training hyperparameters & convergence
 │   ├── table_test_performance.tex         # Test set IV prediction accuracy
 │   ├── table_synthetic_calibration.tex    # Synthetic data calibration comparison
 │   ├── table_spy_data.tex                 # SPY market data description
-│   ├── table_spy_calibration.tex          # Real-market calibration performance
+│   ├── table_spy_calibration.tex          # Real-market calibration performance (SPY)
+│   ├── table_nvda_calibration.tex         # Real-market calibration performance (NVDA)
 │   ├── text_synthetic_calibration.tex     # Narrative for synthetic experiments
 │   └── text_spy_calibration.tex           # Narrative for real-market experiments
 │
 ├── details/                     # Dataset statistics and parameter range tables
 ├── output/                      # Architecture diagrams and figures
-├── par-yield-curve-rates-2020-2023.csv   # Federal Reserve par yield data
 └── README.md
 ```
 
@@ -88,7 +98,8 @@ jupyter notebook 02_calibrate.ipynb
 ```
 **Experiments:**
 - **Part 1 (Synthetic)**: Calibrates on a known Heston parameter set (99 options), validates parameter recovery and re-pricing accuracy
-- **Part 2 (Real SPY)**: Calibrates on SPY call options from Sept 2022, performs same-day and cross-day validation
+- **Part 2 (Real SPY)**: Calibrates on SPY call options from Sept 2022 (100 contracts/day), performs same-day and cross-day validation
+- **Part 3 (Real NVDA)**: Calibrates on NVDA call options from Nov 2021 (100 contracts/day, 6 maturity buckets), tests on a broader and higher-IV surface
 
 ### 3. Visualize Results
 ```bash
@@ -146,14 +157,25 @@ $$\mathcal{L}_{\text{Feller}} = \lambda_F \cdot \text{ReLU}(\sigma^2 - 2\kappa\t
 | Feller satisfied | ✅ Yes | ❌ No |
 | Calibration time | 11.76 s | 11.30 s |
 
-### Real SPY Data Calibration (10 Options per Day)
-| Scenario | Proposed IV-DDN | Zhang (2025) Price-DDN |
-|----------|----------------|----------------------|
-| Same-day (9/2→9/2) IV MRE | **0.16%** | 0.20% |
-| Cross-day (9/1→9/2) IV MRE | **0.96%** | 1.59% |
-| MRE degradation (same→cross) | +0.80 pp | +1.39 pp |
+### Real Market Calibration — SPY (100 Options per Day, Sept 2022)
+| Scenario | Metric | Proposed IV-DDN | Zhang (2025) Price-DDN |
+|----------|--------|----------------|----------------------|
+| Same-day (9/2 → 9/2) | Native IV MRE | **1.56%** | 5.01% |
+| Same-day (9/2 → 9/2) | QuantLib IV MRE | **8.15%** | 9.18% |
+| Same-day (9/2 → 9/2) | QuantLib price MRE | 18.10% | **16.93%** |
+| Cross-day (9/1 → 9/2) | Native IV MRE | **1.98%** | 3.71% |
+| Cross-day (9/1 → 9/2) | QuantLib price MRE | **18.89%** | 20.70% |
 
-**Conclusion**: IV-DDN achieves superior parameter stability across trading days while maintaining competitive fitting accuracy.
+### Real Market Calibration — NVDA (100 Options per Day, Nov 2021, 6 Maturity Buckets)
+| Scenario | Metric | Proposed IV-DDN | Zhang (2025) Price-DDN |
+|----------|--------|----------------|----------------------|
+| Same-day (11/2 → 11/2) | Native IV MRE | **0.97%** | 1.02% |
+| Same-day (11/2 → 11/2) | QuantLib IV MRE | **2.30%** | 4.06% |
+| Same-day (11/2 → 11/2) | QuantLib price MRE | **2.56%** | 4.65% |
+| Cross-day (11/1 → 11/2) | Native IV MRE | **2.39%** | 2.40% |
+| Cross-day (11/1 → 11/2) | QuantLib price MRE | **2.29%** | 7.76% |
+
+**Conclusion**: IV-DDN achieves superior parameter stability across trading days and assets. On SPY the advantage in IV space is substantial; on NVDA (a broader, higher-IV surface spanning 6 maturities) the native errors are comparable but QuantLib-based structural repricing shows a much larger gain for the proposed method.
 
 ---
 

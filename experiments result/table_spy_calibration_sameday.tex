@@ -1,0 +1,33 @@
+% ============================================================
+% Table: Same-Day Calibration on SPY (standalone, for sec 4.3)
+% ============================================================
+\begin{table}[htbp]
+  \centering
+  \caption{Same-Day Calibration Performance on SPY Options (2022-09-02, $M=100$ contracts)}
+  \label{tab:spy_sameday}
+  \setlength{\tabcolsep}{7pt}
+  \begin{tabular}{lccc}
+    \toprule
+    \textbf{Metric} & \textbf{Proposed (IV-DDN)} & \textbf{Zhang (2025)} & \textbf{Difference} \\
+    \midrule
+    \multicolumn{4}{l}{\textit{Native model output}} \\
+    \quad IV MRE & \textbf{1.56\%} & 5.01\% & $-$3.45\,pp \\
+    \quad Price MRE (same-day) & n/a & 13.36\% & --- \\
+    \midrule
+    \multicolumn{4}{l}{\textit{QuantLib re-pricing}} \\
+    \quad IV MRE & \textbf{8.15\%} & 9.18\% & $-$1.03\,pp \\
+    \quad Price MRE & 18.10\% & \textbf{16.93\%} & $+$1.17\,pp \\
+    \midrule
+    \multicolumn{4}{l}{\textit{Calibration Configuration}} \\
+    \quad Objective function & Vega-weighted IV MSE + Feller & Normalised price MSE & --- \\
+    \quad Feller condition enforced & \checkmark~Yes & $\times$~No & --- \\
+    \quad Multi-start restarts & 10 & 10 & --- \\
+    \quad Max steps per restart & 300 & 300 & --- \\
+    \quad Learning rate & $5\times10^{-3}$ & $5\times10^{-3}$ & --- \\
+    \bottomrule
+  \end{tabular}
+  \begin{tablenotes}
+    \small
+    \item \textit{Note:} IV MRE $= \frac{1}{M}\sum_{i=1}^{M}|\hat{\sigma}^{\mathrm{IV}}_i - \sigma^{\mathrm{IV},\mathrm{mkt}}_i|\,/\,|\sigma^{\mathrm{IV},\mathrm{mkt}}_i|$. ``n/a'' means the metric is not directly produced by that method's pipeline. The proposed method calibrates in IV space, so no option price is output natively. The Zhang~(2025) IV rows are derived by converting DDN-predicted prices to Black--Scholes implied volatilities on the 100-contract SPY chain used in the price-space calibration notebook.
+  \end{tablenotes}
+\end{table}

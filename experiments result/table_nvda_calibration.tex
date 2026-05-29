@@ -1,0 +1,33 @@
+% ============================================================
+% Table: NVDA Same-Day and Cross-Day Calibration
+% ============================================================
+\begin{table}[htbp]
+  \centering
+  \caption{Same-Day and Cross-Day Calibration Performance on NVDA Options (2021-11-01 $\rightarrow$ 2021-11-02, $M=100$ contracts)}
+  \label{tab:nvda_calibration}
+  \setlength{\tabcolsep}{6pt}
+  \begin{tabular}{llcc}
+    \toprule
+    \textbf{Scenario} & \textbf{Metric} & \textbf{Heston Project} & \textbf{Zhang (2025)} \\
+    \midrule
+    \multicolumn{4}{l}{\textit{Same-Day: parameters calibrated on 2021-11-02 and evaluated on 2021-11-02}} \\
+    \quad Same-day & Native model IV MRE & 0.97\% & 1.02\% \\
+    \quad Same-day & Native model price MRE & n/a & 1.19\% \\
+    \quad Same-day & QuantLib IV MRE & 2.30\% & 4.06\% \\
+    \quad Same-day & QuantLib price MRE & 2.56\% & 4.65\% \\
+    \midrule
+    \multicolumn{4}{l}{\textit{Cross-Day: parameters calibrated on 2021-11-01 and evaluated on 2021-11-02}} \\
+    \quad Cross-day & Native model IV MRE & 2.39\% & 2.40\% \\
+    \quad Cross-day & Native model price MRE & n/a & 3.08\% \\
+    \quad Cross-day & QuantLib IV MRE & 1.94\% & 6.75\% \\
+    \quad Cross-day & QuantLib price MRE & 2.29\% & 7.76\% \\
+    \midrule
+    \multicolumn{4}{l}{\textit{Degradation from same-day to cross-day}} \\
+    \quad $\Delta$ native IV MRE & Cross-day minus same-day & +1.42 pp & +1.38 pp \\
+    \bottomrule
+  \end{tabular}
+  \begin{tablenotes}
+    \small
+    \item \textit{Note:} IV MRE and price MRE are mean relative errors. The Heston Project model is calibrated directly in implied-volatility space with Vega weighting and a Feller penalty. The Zhang baseline is calibrated in normalised price space; its native IV MRE is computed by converting DDN-predicted prices to Black--Scholes implied volatilities. QuantLib rows re-price the selected NVDA contracts with the calibrated Heston parameters.
+  \end{tablenotes}
+\end{table}

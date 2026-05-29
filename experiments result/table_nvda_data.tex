@@ -1,0 +1,39 @@
+% ============================================================
+% Table: NVDA Market Data Description
+% ============================================================
+\begin{table}[htbp]
+  \centering
+  \caption{Description of NVDA Call Option Data Used for Real-Market Calibration}
+  \label{tab:nvda_data}
+  \begin{tabular}{lcc}
+    \toprule
+    \textbf{Property} & \textbf{2021-11-01 (Calibration)} & \textbf{2021-11-02 (Validation)} \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Underlying Asset}} \\
+    \quad Spot price $S_0$ (\$)       & 258.34 & 264.03 \\
+    \quad Days to expiry (DTE)        & [46, 228] & [45, 227] \\
+    \quad Time to maturity $\tau$ (yr)& [0.1261, 0.6247] & [0.1234, 0.6219] \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Option Chain (after cleaning)}} \\
+    \quad Number of valid contracts   & 100 & 100 \\
+    \quad Maturity buckets selected    & 6 & 6 \\
+    \quad Contracts per maturity       & [16, 17] & [16, 17] \\
+    \quad Strike range $K$ (\$)       & [225.00, 310.00] & [227.50, 315.00] \\
+    \quad Log-moneyness $\ln(K/S_0)$  & [-0.1382, +0.1823] & [-0.1489, +0.1765] \\
+    \quad Market IV range             & [0.3880, 0.4319] & [0.3993, 0.4400] \\
+    \quad Vega range                  & [0.3109, 0.8143] & [0.3137, 0.8305] \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Risk-Free Rate (continuous, interpolated)}} \\
+    \quad Matched $r$ range           & [0.000271, 0.001186] & [0.000470, 0.000992] \\
+    \quad Rate source                 & \multicolumn{2}{c}{US Par Yield Curve (Federal Reserve, 2020--2023)} \\
+    \quad Interpolation method        & \multicolumn{2}{c}{Cubic spline on 1mo/2mo/3mo/6mo/1yr nodes} \\
+    \midrule
+    \multicolumn{3}{l}{\textit{Cleaning Criteria}} \\
+    \quad Option type                 & \multicolumn{2}{c}{Call only} \\
+    \quad DTE filter                  & \multicolumn{2}{c}{40--300 days} \\
+    \quad Log-moneyness filter        & \multicolumn{2}{c}{$\ln(K/S_0) \in [-0.15,\;0.20]$} \\
+    \quad Volume filter               & \multicolumn{2}{c}{Positive call volume required} \\
+    \quad Final selection             & \multicolumn{2}{c}{100 contracts, balanced by maturity and centered around $S_0$ in strike} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
