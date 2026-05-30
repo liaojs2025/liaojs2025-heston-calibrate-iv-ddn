@@ -83,18 +83,16 @@
     \textbf{Metric} & \textbf{Proposed Method} & \textbf{Zhang (2025)} \\
     \midrule
     \multicolumn{3}{l}{\textit{Implied Volatility Space}} \\
-    \quad Mean IV relative error (MRE)  & 3.08\%  & --- \\
-    \quad Max IV relative error         & 9.25\%  & --- \\
-    \quad IV MAE                        & 0.00781 & --- \\
+    \quad Mean IV relative error (MRE)  & 3.08\%  & 11.04\% \\
+    \quad Max IV relative error         & 9.25\%  & 62.84\% \\
     \midrule
-    \multicolumn{3}{l}{\textit{Price Space (QuantLib re-pricing with calibrated parameters)}} \\
+    \multicolumn{3}{l}{\textit{Price Space}} \\
     \quad Mean price relative error     & 12.78\%   & 184.80\% \\
     \quad Max price relative error      & 129.51\%  & 7873.29\% \\
-    \quad Proportion with error $< 5\%$ & ---       & 63.6\% \\
     \bottomrule
   \end{tabular}
   \begin{tablenotes}
     \small
-    \item \textit{Note:} The proposed method calibrates in implied volatility (IV) space with Vega weighting, and re-pricing errors are reported both in IV space and in price space (via QuantLib). Zhang~(2025) calibrates in normalised price space; IV-space metrics are not available for that method. Large price errors for both methods are concentrated in deep out-of-the-money (OTM) contracts ($K/S_0 > 1.3$), where option prices are near zero and small absolute deviations produce disproportionately large relative errors. The proposed method achieves substantially lower price-space errors compared to Zhang~(2025), confirming that IV-space calibration with Feller regularisation provides more physically consistent parameter estimates.
+    \item \textit{Note:} The proposed method calibrates in implied volatility (IV) space with Vega weighting, and re-pricing errors are reported both in IV space and in price space (via QuantLib). Zhang~(2025) calibrates in normalised price space; its IV-space errors are computed by converting DDN-predicted prices to Black--Scholes implied volatilities. Large price errors for both methods are concentrated in deep out-of-the-money (OTM) contracts ($K/S_0 > 1.3$), where option prices are near zero and small absolute deviations produce disproportionately large relative errors. The proposed method achieves substantially lower errors in both IV and price space compared to Zhang~(2025), confirming that IV-space calibration with Feller regularisation provides more physically consistent parameter estimates.
   \end{tablenotes}
 \end{table}
