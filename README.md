@@ -154,7 +154,6 @@ $$\mathcal{L}_{\text{Feller}} = \lambda_F \cdot \text{ReLU}(\sigma^2 - 2\kappa\t
 |--------|----------------|----------------------|
 | IV MRE (mean) | **3.08%** | — |
 | Price MRE (QuantLib) | **12.78%** | 184.80% |
-| Feller satisfied | ✅ Yes | ❌ No |
 | Calibration time | 11.76 s | 11.30 s |
 
 ### Real Market Calibration — SPY (100 Options per Day, Sept 2022)
@@ -212,12 +211,11 @@ If you use this code in your research, please cite:
   author={Liao, Jiansong},
   year={2026},
   school={[Tsinghua University]},
-  note={GitHub: https://github.com/liaojs2025/heston_calibrate_iv_ddn}
+  note={GitHub: https://github.com/liaojs2025/heston-calibrate-iv-ddn}
 }
 ```
 
-**Baseline comparison**: Zhang, Y., et al. (2025). "Calibrating the Heston Model with Deep Differential Networks." *Quantitative Finance*, 25(1), 1-15.
-
+**Baseline comparison**: Zhang, Y., et al. (2025). "Calibrating the Heston Model with Deep Differential Networks."
 ---
 
 ## 📝 License
