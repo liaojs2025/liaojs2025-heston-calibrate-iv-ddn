@@ -64,6 +64,10 @@ This project addresses these challenges by:
 │   ├── text_synthetic_calibration.tex     # Narrative for synthetic experiments
 │   └── text_spy_calibration.tex           # Narrative for real-market experiments
 │
+├── ablation_study/              # Ablation study — self-contained, no notebook dependency
+│   ├── run_ablation.py          # Full ablation pipeline (train → calibrate → report)
+│   └── results/                 # Output: CSVs, LaTeX tables, model checkpoints (gitignored)
+│
 ├── details/                     # Dataset statistics and parameter range tables
 ├── output/                      # Architecture diagrams and figures
 └── README.md
@@ -105,6 +109,13 @@ jupyter notebook 02_calibrate.ipynb
 ```bash
 jupyter notebook 03_calibrate_visualize.ipynb
 ```
+
+### 4. Run the Ablation Study
+```bash
+cd ablation_study
+python run_ablation.py
+```
+Results (CSV, LaTeX table, analysis text) are written to `ablation_study/results/`.
 
 ---
 
@@ -175,6 +186,47 @@ $$\mathcal{L}_{\text{Feller}} = \lambda_F \cdot \text{ReLU}(\sigma^2 - 2\kappa\t
 | Cross-day (11/1 → 11/2) | QuantLib price MRE | **2.29%** | 7.76% |
 
 **Conclusion**: IV-DDN achieves superior parameter stability across trading days and assets. On SPY the advantage in IV space is substantial; on NVDA (a broader, higher-IV surface spanning 6 maturities) the native errors are comparable but QuantLib-based structural repricing shows a much larger gain for the proposed method.
+
+**Conclusion**: IV-DDN achieves superior parameter stability across trading days and assets. On SPY the advantage in IV space is substantial; on NVDA (a broader, higher-IV surface spanning 6 maturities) the native errors are comparable but QuantLib-based structural repricing shows a much larger gain for the proposed method.
+
+---
+
+## 🧪 Ablation Study
+
+The ablation study (`ablation_study/run_ablation.py`) isolates the contribution of each component in the proposed IV-DDN pipeline. Five model variants are evaluated, progressively adding components from a plain IV neural network up to the full proposed method.
+
+| Variant | Description |
+|---------|-------------|
+| **A** | IV-NN — IV prediction only, no derivative supervision |
+| **B** | IV-DDN — derivative loss added, unweighted |
+| **C** | IV-DDN — derivative loss with Vega weighting |
+| **D** | IV-DDN + Vega weighting + **Feller penalty** (λ = 10) ← *proposed method* |
+| **E** | Same as D but with MSE derivative loss instead of Smooth L1 (Huber) |
+
+**Evaluation dimensions** (all on held-out data):
+- **Test IV MRE**: Mean relative error on the 25k-sample test set
+- **Synthetic IV MRE**: Calibration error on the 99-contract synthetic chain
+- **Same-day IV MRE**: Average native IV MRE on SPY (2022-09-02) and NVDA (2021-11-02) same-day calibration
+- **Feller violation rate**: Fraction of calibrated parameter sets violating $2\kappa\theta > \sigma^2$
+
+Key findings:
+- **Derivative supervision** (A→B→C) improves calibration stability in the Vega-sensitive ATM region; Vega-weighting focuses gradient information where it matters most
+- **Feller penalty** (C→D) substantially reduces physically infeasible parameter estimates without sacrificing IV accuracy
+- **Smooth L1 vs MSE** (D vs E) for the derivative loss: Huber loss provides robustness against large local sensitivities in deep OTM options
+
+```bash
+# Run full ablation (trains 5 variants × 200 epochs, then calibrates):
+python ablation_study/run_ablation.py
+
+# Quick smoke test:
+python ablation_study/run_ablation.py --epochs 1 --train-limit 2000 --calibration-starts 1 --calibration-steps 2 --force-train
+```
+
+Outputs written to `ablation_study/results/`:
+- `ablation_results.csv` — full metrics table
+- `ablation_table.tex` — LaTeX table for thesis/paper
+- `ablation_analysis.tex` — auto-generated narrative text
+- `models/` — trained checkpoints for each variant
 
 ---
 
